@@ -1,0 +1,83 @@
+/* Keyframes */
+@keyframes driftX {
+  0% { transform: translateX(-10%) translateY(0) rotate(0.001deg); }
+  50% { transform: translateX(10%) translateY(-2%) rotate(0.001deg); }
+  100% { transform: translateX(-10%) translateY(0) rotate(0.001deg); }
+}
+@keyframes driftY {
+  0% { transform: translateY(0) rotate(0.001deg); }
+  50% { transform: translateY(-6%) rotate(0.001deg); }
+  100% { transform: translateY(0) rotate(0.001deg); }
+}
+
+/* Root hero wrapper for positioning - establishes the stacking context */
+.heroRoot {
+  position: relative;
+  min-height: 70vh;
+  overflow: hidden;
+  background: #020617; /* Ensure consistent background */
+}
+
+/* Aurora layers */
+.auroraLayer {
+  position: absolute;
+  inset: -20% -10% -10% -10%;
+  filter: blur(28px) saturate(110%);
+  opacity: 0.8;
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: 10; 
+}
+
+/* Soft vignette */
+.vignette::after {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 120% at 50% 40%, rgba(0,0,0,0) 0%, rgba(2,6,23,0.35) 65%, rgba(2,6,23,0.65) 100%);
+}
+
+/* Strands */
+.auroraStrand {
+  position: absolute;
+  width: 140%;
+  height: 60%;
+  left: -20%;
+  top: 10%;
+  opacity: 0.6;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  animation: driftX 14s ease-in-out infinite, driftY 18s ease-in-out infinite;
+}
+
+
+/* Gradient “paints” */
+.bgAurora1 {
+  background:
+    radial-gradient(1200px 500px at 10% 30%, rgba(186,230,253,0.14), transparent 60%),
+    radial-gradient(1000px 400px at 80% 10%, rgba(125,211,252,0.14), transparent 60%),
+    linear-gradient(100deg, rgba(56,189,248,0.3), rgba(59,130,246,0.18), rgba(20,184,166,0.12));
+}
+.bgAurora2 {
+  background:
+    radial-gradient(900px 400px at 20% 80%, rgba(191,219,254,0.16), transparent 60%),
+    radial-gradient(1100px 500px at 85% 60%, rgba(125,211,252,0.16), transparent 60%),
+    linear-gradient(110deg, rgba(14,165,233,0.28), rgba(37,99,235,0.16), rgba(6,182,212,0.12));
+}
+.bgAurora3 {
+  background:
+    radial-gradient(1200px 500px at 60% 20%, rgba(125,211,252,0.18), transparent 60%),
+    radial-gradient(900px 400px at 25% 50%, rgba(191,219,254,0.18), transparent 60%),
+    linear-gradient(95deg, rgba(59,130,246,0.26), rgba(6,182,212,0.14), rgba(14,165,233,0.12));
+}
+.bgAurora4 {
+  background:
+    radial-gradient(1000px 500px at 75% 75%, rgba(186,230,253,0.18), transparent 60%),
+    radial-gradient(1200px 500px at 35% 30%, rgba(125,211,252,0.18), transparent 60%),
+    linear-gradient(120deg, rgba(2,132,199,0.22), rgba(14,165,233,0.14), rgba(59,130,246,0.12));
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .auroraStrand { animation: none; }
+}

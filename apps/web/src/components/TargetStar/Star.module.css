@@ -1,0 +1,38 @@
+/* SVG star container */
+.targetStar {
+  position: fixed;
+  left: 15%;
+  top: 45%;
+  width: 20px;  /* Larger base size */
+  height: 20px;
+  z-index: 50;
+  transform-origin: center;
+  transition: transform 0.1s ease-out, filter 0.1s ease-out;
+}
+
+/* Star glow effect */
+.starGlow {
+  filter: drop-shadow(0 0 10px #60a5fa) drop-shadow(0 0 20px rgba(96, 165, 250, 0.5));
+  transition: filter 0.1s ease-out;
+}
+
+/* Pulse animation for the glow */
+@keyframes starPulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 20px #60a5fa) drop-shadow(0 0 40px rgba(96, 165, 250, 0.3));
+  }
+  50% { 
+    filter: drop-shadow(0 0 30px #60a5fa) drop-shadow(0 0 60px rgba(96, 165, 250, 0.5));
+  }
+}
+
+.starGlow.pulsing {
+  animation: starPulse 3s ease-in-out infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .starGlow.pulsing { 
+    animation: none; 
+  }
+}

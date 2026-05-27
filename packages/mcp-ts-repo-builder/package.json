@@ -1,0 +1,29 @@
+{
+  "name": "mcp-ts-repo-builder",
+  "version": "1.0.0",
+  "description": "Local TypeScript sample repository for testing codebase analysis agents.",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-ts-repo-builder": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npm run build && node dist/index.js",
+    "test": "echo \"No automated tests configured for this fixture repository.\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@langchain/core": "^1.1.46",
+    "@langchain/langgraph": "^1.3.0",
+    "@langchain/openai": "^1.4.5",
+    "commander": "^14.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.7.0",
+    "typescript": "^6.0.3"
+  }
+}

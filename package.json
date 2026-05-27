@@ -1,0 +1,21 @@
+{
+  "name": "alunytee",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Alunyte monorepo — onboarding agent web app and analysis fixtures",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @alunytee/web",
+    "build": "npm run build -w @alunytee/web",
+    "lint": "npm run lint -w @alunytee/web",
+    "build:fixture": "npm run build -w mcp-ts-repo-builder"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tofuwang45/alunytee.git"
+  },
+  "license": "ISC"
+}
