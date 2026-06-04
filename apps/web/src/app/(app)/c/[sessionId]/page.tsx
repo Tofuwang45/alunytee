@@ -1,0 +1,88 @@
+import { Suspense } from "react";
+import { notFound } from "next/navigation";
+import SessionChat from "@/components/chat/SessionChat";
+import { goalToFirstQuestion, isDepthLevel } from "@/lib/ai/depth";
+import { prisma } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+
+function SessionContent({
+  sessionId,
+  repositoryId,
+  repoName,
+  repoUrl,
+  defaultBranch,
+  depth,
+  messages,
+  seedQuestion,
+}: {
+  sessionId: string;
+  repositoryId: string;
+  repoName: string;
+  repoUrl: string;
+  defaultBranch: string | null;
+  depth: string;
+  messages: {
+    id: string;
+    role: string;
+    content: string;
+    references: unknown;
+    context: unknown;
+    usedModel: string | null;
+  }[];
+  seedQuestion?: string;
+}) {
+  return (
+    <SessionChat
+      sessionId={sessionId}
+      repositoryId={repositoryId}
+      repoName={repoName}
+      repoUrl={repoUrl}
+      defaultBranch={defaultBranch}
+      initialDepth={depth}
+      initialMessages={messages}
+      seedQuestion={seedQuestion}
+    />
+  );
+}
+
+export default async function SessionPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ sessionId: string }>;
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { sessionId } = await params;
+  const { q } = await searchParams;
+
+  const session = await prisma.chatSession.findUnique({
+    where: { id: sessionId },
+    include: {
+      repository: {
+        select: { id: true, name: true, url: true, defaultBranch: true },
+      },
+      messages: { orderBy: { createdAt: "asc" } },
+    },
+  });
+
+  if (!session) notFound();
+
+  const seedQuestion =
+    q ?? (session.messages.length === 0 && session.goal ? goalToFirstQuestion(session.goal) : undefined);
+
+  return (
+    <Suspense fallback={<div className="p-6 text-sm text-muted">Loading chat...</div>}>
+      <SessionContent
+        sessionId={session.id}
+        repositoryId={session.repository.id}
+        repoName={session.repository.name}
+        repoUrl={session.repository.url}
+        defaultBranch={session.repository.defaultBranch}
+        depth={isDepthLevel(session.depth) ? session.depth : "plain"}
+        messages={session.messages}
+        seedQuestion={seedQuestion}
+      />
+    </Suspense>
+  );
+}

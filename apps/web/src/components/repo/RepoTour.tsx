@@ -70,7 +70,7 @@ export default function RepoTour({ repositoryId }: { repositoryId: string }) {
                       {step.files.map((file) => (
                         <Link
                           key={file}
-                          href={`/repos/${repositoryId}/chat?q=${encodeURIComponent(`Explain ${file}`)}`}
+                          href="/"
                           className="inline-flex items-center gap-1 rounded-md border border-border-default bg-canvas px-2 py-1 font-mono text-xs text-accent-fg hover:border-accent"
                         >
                           <MessageSquareText className="h-3 w-3" />
@@ -88,7 +88,7 @@ export default function RepoTour({ repositoryId }: { repositoryId: string }) {
 
       {tour ? (
         <div className="flex flex-wrap gap-2">
-          <Link href={`/repos/${repositoryId}/chat`}>
+          <Link href="/">
             <Button>
               <MessageSquareText className="h-4 w-4" />
               Ask a follow-up

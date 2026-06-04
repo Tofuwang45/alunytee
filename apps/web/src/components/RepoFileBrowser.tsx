@@ -98,7 +98,7 @@ export default function RepoFileBrowser({ repositoryId }: { repositoryId: string
                     <span className="truncate font-mono text-sm text-fg">{file.path}</span>
                   </button>
                   <Badge variant="muted">{file.language ?? "text"}</Badge>
-                  <Link href={`/repos/${repositoryId}/chat?q=${encodeURIComponent(`Explain ${file.path}`)}`}>
+                  <Link href="/">
                     <Button variant="ghost" size="sm">
                       <MessageSquareText className="h-3.5 w-3.5" />
                     </Button>

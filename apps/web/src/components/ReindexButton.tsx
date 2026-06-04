@@ -23,7 +23,7 @@ export default function ReindexButton({ repoUrl }: { repoUrl: string }) {
       if (!response.ok || !data.repositoryId) {
         throw new Error(data.error ?? "Unable to reindex repository.");
       }
-      router.push(`/repos/${data.repositoryId}`);
+      router.push(`/repos/${data.repositoryId}/explore`);
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to reindex.");

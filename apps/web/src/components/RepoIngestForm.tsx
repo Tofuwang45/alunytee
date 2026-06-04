@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 
-export default function RepoIngestForm() {
+export default function RepoIngestForm({ redirectTo }: { redirectTo?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [url, setUrl] = useState("");
@@ -34,14 +34,14 @@ export default function RepoIngestForm() {
           throw new Error(result.error ?? "Unable to reindex repository.");
         }
         setSuccess("Repository reindexed successfully.");
-        router.replace(`/repos/${result.repositoryId}`);
+        router.replace(redirectTo ?? `/repos/${result.repositoryId}/explore`);
         router.refresh();
       })
       .catch((caught) => {
         setError(caught instanceof Error ? caught.message : "Unable to reindex repository.");
       })
       .finally(() => setIsLoading(false));
-  }, [searchParams, router]);
+  }, [searchParams, router, redirectTo]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,7 +61,7 @@ export default function RepoIngestForm() {
         throw new Error(data.error ?? "Unable to ingest repository.");
       }
 
-      router.push(`/repos/${data.repositoryId}`);
+      router.push(redirectTo ?? `/repos/${data.repositoryId}/explore`);
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to ingest repository.");

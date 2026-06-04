@@ -11,6 +11,46 @@ export function isDepthLevel(value: unknown): value is DepthLevel {
   return value === "plain" || value === "product" || value === "developer" || value === "deep";
 }
 
+export type IntakeRole = "developer" | "product" | "designer" | "non_technical" | "other";
+export type IntakeExperience = "new" | "some" | "experienced";
+export type IntakeGoal =
+  | "understand"
+  | "setup"
+  | "find"
+  | "contribute"
+  | "explain";
+
+export function depthFromIntake(role: string, experience: string): DepthLevel {
+  if (role === "non_technical" || role === "designer") return "plain";
+  if (role === "product") return "product";
+  if (role === "developer" && experience === "experienced") return "deep";
+  if (role === "developer") return "developer";
+  return "plain";
+}
+
+const PRESET_GOALS = new Set(["understand", "setup", "find", "contribute", "explain"]);
+
+export function goalToFirstQuestion(goal: string): string {
+  if (!PRESET_GOALS.has(goal)) {
+    const trimmed = goal.trim();
+    if (!trimmed) return "What does this project do and how is it organized?";
+    return trimmed.endsWith("?") ? trimmed : `${trimmed}?`;
+  }
+  switch (goal) {
+    case "setup":
+      return "How do I set this up and run it locally?";
+    case "find":
+      return "Where is the main feature implemented in this codebase?";
+    case "contribute":
+      return "How do I prepare to make my first contribution to this project?";
+    case "explain":
+      return "Explain what this project does in plain English.";
+    case "understand":
+    default:
+      return "What does this project do and how is it organized?";
+  }
+}
+
 export function depthGuidance(depth: DepthLevel): string {
   switch (depth) {
     case "plain":

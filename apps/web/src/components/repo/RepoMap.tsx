@@ -24,11 +24,10 @@ const ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function RepoMap({
-  repoId,
   areas,
   variant = "full",
 }: {
-  repoId: string;
+  repoId?: string;
   areas: ConceptArea[];
   variant?: "full" | "preview";
 }) {
@@ -54,7 +53,7 @@ export default function RepoMap({
               {area.files.slice(0, 4).map((file) => (
                 <li key={file} className="truncate">
                   <Link
-                    href={`/repos/${repoId}/chat?q=${encodeURIComponent(`Explain ${file}`)}`}
+                    href="/"
                     className="font-mono text-xs text-accent-fg hover:underline"
                   >
                     {file}
@@ -68,7 +67,7 @@ export default function RepoMap({
           ) : null}
 
           <Link
-            href={`/repos/${repoId}/chat?q=${encodeURIComponent(`Explain the ${area.label} part of this codebase`)}`}
+            href="/"
             className={cn(
               "mt-3 inline-flex w-fit items-center gap-1 rounded-md border border-border-default px-2.5 py-1 text-xs text-fg transition hover:border-accent hover:text-accent-fg",
             )}
