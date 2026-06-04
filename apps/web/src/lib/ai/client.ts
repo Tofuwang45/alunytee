@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { repoQaSystemPrompt, repoQaUserPrompt } from "@/lib/ai/prompts";
+import { DepthLevel } from "@/lib/ai/depth";
 import { RetrievedChunk } from "@/lib/retrieval/search";
 
 export type RepoAnswer = {
@@ -18,13 +19,26 @@ function getOpenAIClient() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
+function buildReferences(chunks: RetrievedChunk[]) {
+  const seen = new Set<string>();
+  return chunks
+    .map((chunk) => ({
+      filePath: chunk.filePath,
+      startLine: chunk.startLine,
+      endLine: chunk.endLine,
+      score: chunk.score,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .filter((ref) => {
+      const key = `${ref.filePath}:${ref.startLine ?? ""}:${ref.endLine ?? ""}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
 function fallbackAnswer(question: string, chunks: RetrievedChunk[]): RepoAnswer {
-  const references = chunks.map((chunk) => ({
-    filePath: chunk.filePath,
-    startLine: chunk.startLine,
-    endLine: chunk.endLine,
-    score: chunk.score,
-  }));
+  const references = buildReferences(chunks);
   const fileList = [...new Set(chunks.map((chunk) => chunk.filePath))].slice(0, 5);
   const excerpts = chunks
     .slice(0, 3)
@@ -48,7 +62,11 @@ function fallbackAnswer(question: string, chunks: RetrievedChunk[]): RepoAnswer 
   };
 }
 
-export async function answerRepoQuestion(question: string, chunks: RetrievedChunk[]): Promise<RepoAnswer> {
+export async function answerRepoQuestion(
+  question: string,
+  chunks: RetrievedChunk[],
+  depth: DepthLevel = "developer",
+): Promise<RepoAnswer> {
   const client = getOpenAIClient();
 
   if (!client) {
@@ -60,7 +78,7 @@ export async function answerRepoQuestion(question: string, chunks: RetrievedChun
     model,
     temperature: 0.2,
     messages: [
-      { role: "system", content: repoQaSystemPrompt() },
+      { role: "system", content: repoQaSystemPrompt(depth) },
       { role: "user", content: repoQaUserPrompt(question, chunks) },
     ],
   });
@@ -70,11 +88,6 @@ export async function answerRepoQuestion(question: string, chunks: RetrievedChun
     answer:
       completion.choices[0]?.message.content ??
       "I could not generate an answer from the retrieved repository context.",
-    references: chunks.map((chunk) => ({
-      filePath: chunk.filePath,
-      startLine: chunk.startLine,
-      endLine: chunk.endLine,
-      score: chunk.score,
-    })),
+    references: buildReferences(chunks),
   };
 }

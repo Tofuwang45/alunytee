@@ -1,18 +1,52 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Loader2, PlugZap } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 
 export default function RepoIngestForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    const reingestId = searchParams.get("reingest");
+    if (!reingestId) return;
+
+    setIsLoading(true);
+    fetch(`/api/repos/${reingestId}`)
+      .then((res) => res.json())
+      .then(async (data: { repo?: { url: string; id: string }; error?: string }) => {
+        if (!data.repo?.url) throw new Error(data.error ?? "Repository not found.");
+        setUrl(data.repo.url);
+        const response = await fetch("/api/repos/ingest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: data.repo.url }),
+        });
+        const result = (await response.json()) as { repositoryId?: string; error?: string };
+        if (!response.ok || !result.repositoryId) {
+          throw new Error(result.error ?? "Unable to reindex repository.");
+        }
+        setSuccess("Repository reindexed successfully.");
+        router.replace(`/repos/${result.repositoryId}`);
+        router.refresh();
+      })
+      .catch((caught) => {
+        setError(caught instanceof Error ? caught.message : "Unable to reindex repository.");
+      })
+      .finally(() => setIsLoading(false));
+  }, [searchParams, router]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setSuccess("");
     setIsLoading(true);
 
     try {
@@ -37,29 +71,30 @@ export default function RepoIngestForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-      <label htmlFor="repo-url" className="block text-sm font-medium text-slate-700">
-        Public GitHub repository URL
-      </label>
-      <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-        <input
-          id="repo-url"
-          value={url}
-          onChange={(event) => setUrl(event.target.value)}
-          placeholder="https://github.com/vercel/next.js"
-          className="min-h-11 flex-1 rounded-md border border-slate-300 px-3 text-sm text-slate-900 outline-none transition focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100"
-          required
-        />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-cyan-700 px-4 text-sm font-semibold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-        >
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlugZap className="h-4 w-4" />}
-          {isLoading ? "Indexing..." : "Ingest Repo"}
-        </button>
-      </div>
-      {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-    </form>
+    <Card>
+      <CardContent className="pt-6">
+        <form onSubmit={onSubmit} className="space-y-3">
+          <label htmlFor="repo-url" className="block text-sm font-medium text-fg">
+            Public GitHub repository URL
+          </label>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input
+              id="repo-url"
+              value={url}
+              onChange={(event) => setUrl(event.target.value)}
+              placeholder="https://github.com/vercel/next.js"
+              className="min-h-11 flex-1 rounded-md border border-border-default bg-canvas px-3 text-sm text-fg outline-none transition focus:border-accent"
+              required
+            />
+            <Button type="submit" disabled={isLoading} size="lg">
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlugZap className="h-4 w-4" />}
+              {isLoading ? "Indexing..." : "Ingest Repo"}
+            </Button>
+          </div>
+          {error ? <p className="text-sm text-danger">{error}</p> : null}
+          {success ? <p className="text-sm text-[#3fb950]">{success}</p> : null}
+        </form>
+      </CardContent>
+    </Card>
   );
 }
