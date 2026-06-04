@@ -28,6 +28,7 @@ function SessionContent({
     content: string;
     references: unknown;
     context: unknown;
+    structured: unknown;
     usedModel: string | null;
   }[];
   seedQuestion?: string;

@@ -78,15 +78,15 @@ function MarkdownCodeBlock({
 
   if (!html) {
     return (
-      <pre className="overflow-x-auto rounded-lg bg-slate-950 p-4">
-        <code className="text-xs text-slate-100">{code}</code>
+      <pre className="overflow-x-auto rounded-md border border-border-default bg-code-bg p-3">
+        <code className="text-xs leading-5 text-fg">{code}</code>
       </pre>
     );
   }
 
   return (
     <div
-      className="overflow-x-auto rounded-lg bg-slate-950 p-4 [&_pre]:!m-0 [&_pre]:!bg-transparent [&_pre]:!p-0 [&_code]:!text-xs [&_code]:!leading-5"
+      className="overflow-x-auto rounded-md border border-border-default bg-code-bg p-3 [&_pre]:!m-0 [&_pre]:!bg-transparent [&_pre]:!p-0 [&_code]:!text-xs [&_code]:!leading-5"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -102,7 +102,7 @@ export default function AnswerMarkdown({
   onSelectSource: (source: ActiveSource) => void;
 }) {
   return (
-    <div className="markdown-answer text-sm text-fg">
+    <div className="markdown-answer space-y-2 text-sm text-fg">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{

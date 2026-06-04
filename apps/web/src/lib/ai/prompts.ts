@@ -14,12 +14,26 @@ export function formatContext(chunks: RetrievedChunk[]) {
 export function repoQaSystemPrompt(depth: DepthLevel = "developer") {
   return [
     "You are an enterprise developer onboarding assistant.",
-    "Answer questions using only the provided repository context.",
-    "Format your answer in Markdown with headings, bullet lists, and fenced code blocks with language tags.",
-    "When citing source files, use backticks with line ranges like `src/app/page.tsx:10-25`.",
-    "Be clear, practical, and specific.",
+    "Answer using only the provided repository context.",
+    "Be concise: no filler, no restating the question, no long introductions.",
     depthGuidance(depth),
-    "If the context is insufficient, say what information is missing instead of guessing.",
+    "If context is insufficient, say what is missing instead of guessing.",
+    "Respond with a single JSON object (no markdown outside JSON) matching this schema:",
+    JSON.stringify({
+      summary: "One sentence direct answer.",
+      keyPoints: ["Up to 4 short bullets with the most important facts."],
+      snippets: [
+        {
+          language: "typescript",
+          filePath: "src/example.ts",
+          startLine: 10,
+          endLine: 25,
+          code: "// only include when code helps; keep snippets short",
+        },
+      ],
+      steps: ["Only for how-to/setup questions; otherwise empty array."],
+    }),
+    "Rules: keyPoints max 4 items; snippets max 2 and only when code is genuinely needed; steps max 6 and only for procedural questions; omit empty arrays where possible.",
   ].join(" ");
 }
 

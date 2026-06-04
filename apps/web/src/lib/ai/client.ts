@@ -1,10 +1,17 @@
 import OpenAI from "openai";
 import { repoQaSystemPrompt, repoQaUserPrompt } from "@/lib/ai/prompts";
 import { DepthLevel } from "@/lib/ai/depth";
+import {
+  StructuredAnswer,
+  buildFallbackStructured,
+  parseStructuredAnswer,
+  structuredToMarkdown,
+} from "@/lib/ai/structured";
 import { RetrievedChunk } from "@/lib/retrieval/search";
 
 export type RepoAnswer = {
   answer: string;
+  structured: StructuredAnswer | null;
   references: {
     filePath: string;
     startLine: number | null;
@@ -39,26 +46,12 @@ function buildReferences(chunks: RetrievedChunk[]) {
 
 function fallbackAnswer(question: string, chunks: RetrievedChunk[]): RepoAnswer {
   const references = buildReferences(chunks);
-  const fileList = [...new Set(chunks.map((chunk) => chunk.filePath))].slice(0, 5);
-  const excerpts = chunks
-    .slice(0, 3)
-    .map((chunk) => {
-      const preview = chunk.content.split(/\r?\n/).slice(0, 6).join("\n");
-      return `From ${chunk.filePath}${chunk.startLine ? `:${chunk.startLine}` : ""}:\n${preview}`;
-    })
-    .join("\n\n");
-
+  const structured = buildFallbackStructured(question, chunks);
   return {
     usedModel: "local-retrieval-fallback",
     references,
-    answer: [
-      `I found repository context that appears relevant to "${question}".`,
-      fileList.length ? `Start with ${fileList.map((file) => `\`${file}\``).join(", ")}.` : "",
-      "Add `OPENAI_API_KEY` to get a synthesized answer; for now, here are the most relevant excerpts:",
-      excerpts,
-    ]
-      .filter(Boolean)
-      .join("\n\n"),
+    structured,
+    answer: structuredToMarkdown(structured),
   };
 }
 
@@ -77,17 +70,42 @@ export async function answerRepoQuestion(
   const completion = await client.chat.completions.create({
     model,
     temperature: 0.2,
+    response_format: { type: "json_object" },
     messages: [
       { role: "system", content: repoQaSystemPrompt(depth) },
       { role: "user", content: repoQaUserPrompt(question, chunks) },
     ],
   });
 
+  const raw = completion.choices[0]?.message.content ?? "";
+  let structured: StructuredAnswer | null = null;
+
+  if (raw) {
+    try {
+      structured = parseStructuredAnswer(JSON.parse(raw));
+    } catch {
+      structured = {
+        summary: raw.slice(0, 500),
+        keyPoints: [],
+        snippets: [],
+        steps: [],
+      };
+    }
+  }
+
+  if (!structured) {
+    structured = {
+      summary: "I could not generate an answer from the retrieved repository context.",
+      keyPoints: [],
+      snippets: [],
+      steps: [],
+    };
+  }
+
   return {
     usedModel: model,
-    answer:
-      completion.choices[0]?.message.content ??
-      "I could not generate an answer from the retrieved repository context.",
+    structured,
+    answer: structuredToMarkdown(structured),
     references: buildReferences(chunks),
   };
 }

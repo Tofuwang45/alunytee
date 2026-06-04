@@ -1,3 +1,5 @@
+import { StructuredAnswer } from "@/lib/ai/structured";
+
 export type FileReference = {
   filePath: string;
   startLine: number | null;
@@ -16,6 +18,7 @@ export type RetrievedChunk = {
 
 export type ChatResponse = {
   answer: string;
+  structured: StructuredAnswer | null;
   usedModel: string;
   references: FileReference[];
   context: RetrievedChunk[];
@@ -34,6 +37,7 @@ export type ChatMessage =
       role: "assistant";
       content: string;
       usedModel: string;
+      structured: StructuredAnswer | null;
       references: FileReference[];
       context: RetrievedChunk[];
     };

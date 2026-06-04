@@ -25,6 +25,7 @@ import {
   dedupeReferences,
 } from "./types";
 import { DepthLevel, isDepthLevel } from "@/lib/ai/depth";
+import { parseStructuredAnswer } from "@/lib/ai/structured";
 import { fetchJson } from "@/lib/utils/fetch-json";
 import { cn } from "@/lib/utils/cn";
 
@@ -40,6 +41,7 @@ type PersistedTurn = {
   content: string;
   references: unknown;
   context: unknown;
+  structured: unknown;
   usedModel: string | null;
 };
 
@@ -53,6 +55,7 @@ function toChatMessages(turns: PersistedTurn[]): ChatMessage[] {
       role: "assistant" as const,
       content: t.content,
       usedModel: t.usedModel ?? "fallback",
+      structured: parseStructuredAnswer(t.structured),
       references: (t.references as FileReference[]) ?? [],
       context: (t.context as RetrievedChunk[]) ?? [],
     };
@@ -152,6 +155,7 @@ export default function SessionChat({
               role: "assistant",
               content: data.answer,
               usedModel: data.usedModel,
+              structured: data.structured ?? null,
               references,
               context: data.context,
             },

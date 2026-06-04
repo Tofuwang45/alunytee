@@ -69,6 +69,7 @@ export async function POST(request: Request) {
             content: answer.answer,
             references: answer.references,
             context: chunks,
+            structured: answer.structured ?? undefined,
             usedModel: answer.usedModel,
           },
         })
