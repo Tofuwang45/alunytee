@@ -1,9 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Loader2, Send } from "lucide-react";
+import { Loader2, Mic, MicOff, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import SuggestedQuestions from "./SuggestedQuestions";
+import { useSpeechToText } from "@/lib/hooks/useSpeechToText";
+import { cn } from "@/lib/utils/cn";
 
 export default function ChatComposer({
   onSubmit,
@@ -16,12 +18,21 @@ export default function ChatComposer({
 }) {
   const [question, setQuestion] = useState("");
 
+  const { start, stop, isRecording, error: micError } = useSpeechToText((text) => {
+    setQuestion((prev) => (prev ? `${prev} ${text}` : text));
+  });
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = question.trim();
     if (!trimmed || isLoading) return;
     onSubmit(trimmed);
     setQuestion("");
+  }
+
+  function toggleMic() {
+    if (isRecording) stop();
+    else start();
   }
 
   return (
@@ -35,6 +46,7 @@ export default function ChatComposer({
           disabled={isLoading}
         />
       ) : null}
+      {micError ? <p className="mt-2 text-xs text-danger">{micError}</p> : null}
       <form onSubmit={handleSubmit} className="mt-3 flex gap-2">
         <textarea
           value={question}
@@ -49,6 +61,16 @@ export default function ChatComposer({
             }
           }}
         />
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isLoading}
+          onClick={toggleMic}
+          className={cn("self-end", isRecording && "border-danger text-danger")}
+          title={isRecording ? "Stop recording" : "Speak your question"}
+        >
+          {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+        </Button>
         <Button type="submit" disabled={isLoading || !question.trim()} className="self-end">
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           <span className="hidden sm:inline">Ask</span>
