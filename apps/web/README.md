@@ -1,6 +1,8 @@
 # Alunyte Onboarding Agent
 
-Local-first MVP for an AI enterprise developer onboarding agent. The app indexes a public GitHub repository, stores useful files and chunks in SQLite, retrieves relevant context for questions, and answers with file references.
+Local-first MVP for an AI enterprise developer onboarding agent. The app indexes a public GitHub repository, stores useful files and chunks in SQLite, retrieves relevant context for questions, and answers with structured responses and file references.
+
+See the root [README.md](../../README.md) for the project submission rubric and overview.
 
 ## Tech Stack
 
@@ -8,11 +10,22 @@ Local-first MVP for an AI enterprise developer onboarding agent. The app indexes
 - React 19
 - TypeScript
 - Tailwind CSS 4
-- Prisma
-- SQLite
+- Prisma + SQLite (better-sqlite3 adapter)
 - OpenAI SDK behind a small AI service abstraction
 
 ## Setup
+
+From the monorepo root:
+
+```bash
+npm install
+cp apps/web/.env.example apps/web/.env
+npm run prisma:generate -w @alunytee/web
+npm run db:push -w @alunytee/web
+npm run dev
+```
+
+Or from this directory:
 
 ```bash
 npm install
@@ -28,13 +41,17 @@ Open http://localhost:3000.
 
 ```env
 OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4o-mini
+OPENAI_TTS_MODEL=gpt-4o-mini-tts
+OPENAI_STT_MODEL=whisper-1
 GITHUB_TOKEN=
 DATABASE_URL="file:./dev.db"
 ```
 
-- `OPENAI_API_KEY` is optional for ingestion. Without it, chat returns a retrieval-based fallback with source excerpts.
+- `OPENAI_API_KEY` is optional. Without it, chat returns a retrieval-based fallback with source excerpts (`usedModel: local-retrieval-fallback`).
+- `OPENAI_MODEL`, `OPENAI_TTS_MODEL`, and `OPENAI_STT_MODEL` override default OpenAI models.
 - `GITHUB_TOKEN` is optional for public repos, but recommended to avoid GitHub rate limits.
-- `DATABASE_URL` defaults to a local SQLite file.
+- `DATABASE_URL` defaults to a local SQLite file. All indexed repo data stays on your machine.
 
 ## How Repo Ingestion Works
 
@@ -49,19 +66,68 @@ DATABASE_URL="file:./dev.db"
 
 Included file types include Markdown, text, common application languages, JSON/YAML/TOML/SQL, and `Dockerfile`.
 
-## MVP Routes
+## Routes
 
-- `/` dashboard and repo connection form
-- `/repos/[repoId]` indexed repo overview
-- `/repos/[repoId]/chat` repo Q&A with file references and retrieved context
-- `/progress` placeholder for the next onboarding/progress slice
+| Route | Description |
+|-------|-------------|
+| `/` | Dashboard, repo connection form, and new chat intake |
+| `/c/[sessionId]` | Session-based Q&A with structured answers, citations, depth switch, voice I/O |
+| `/repos/[repoId]` | Indexed repo overview |
+| `/repos/[repoId]/brief` | Auto-generated onboarding brief |
+| `/repos/[repoId]/tour` | Guided repo tour |
+| `/repos/[repoId]/explore` | Concept map and insights |
+| `/local-agent` | Documentation for the fixture CLI agent |
+| `/progress` | Placeholder for onboarding progress (not yet implemented) |
 
 ## API Routes
 
-- `GET /api/repos`
-- `POST /api/repos/ingest`
-- `GET /api/repos/[repoId]`
-- `POST /api/chat`
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/repos` | List indexed repositories |
+| `POST` | `/api/repos/ingest` | Ingest a public GitHub URL |
+| `GET` | `/api/repos/[repoId]` | Repository metadata and counts |
+| `GET` | `/api/repos/[repoId]/files` | Indexed files for a repo |
+| `GET` | `/api/repos/[repoId]/brief` | Onboarding brief content |
+| `GET` | `/api/repos/[repoId]/tour` | Repo tour steps |
+| `GET` | `/api/sessions` | List chat sessions |
+| `POST` | `/api/sessions` | Create a session (intake → repo + depth) |
+| `GET` | `/api/sessions/[sessionId]` | Session with chat turns |
+| `POST` | `/api/chat` | Ask a question (`sessionId` or `repositoryId` + `question`) |
+| `POST` | `/api/stt` | Speech-to-text (Whisper); browser Web Speech API used first on client |
+| `POST` | `/api/tts` | Text-to-speech (OpenAI audio); browser fallback on client |
+
+## Features
+
+### Structured answers
+
+Assistant responses use a JSON schema rendered by `StructuredAnswer`:
+
+- `summary` — concise answer
+- `keyPoints` — bullet list
+- `snippets` — code blocks with file paths and line numbers
+- `steps` — numbered procedure when applicable
+
+Answers are persisted on `ChatTurn.structured` and converted to markdown/TTS as needed.
+
+### Depth levels
+
+| Level | Audience |
+|-------|----------|
+| `plain` | Non-technical; minimal jargon |
+| `product` | PM; features and flows |
+| `developer` | Working engineer; implementation detail |
+| `deep` | Senior engineer; architecture and trade-offs |
+
+Intake maps role/experience to a default depth; users can switch depth per session.
+
+### Citations
+
+Retrieved chunks produce `references[]` with `filePath`, `startLine`, `endLine`, and `score`. The UI links citations to an inline code viewer and source panel.
+
+### Voice I/O
+
+- **STT:** `useSpeechToText` tries the browser Web Speech API, then falls back to recording + `/api/stt` (Whisper).
+- **TTS:** `useTextToSpeech` uses OpenAI TTS when configured, otherwise `speechSynthesis`. Listen button on assistant messages.
 
 ## Known Limitations
 
@@ -69,7 +135,8 @@ Included file types include Markdown, text, common application languages, JSON/Y
 - Ingestion runs inside the request lifecycle, so very large repos may time out.
 - Retrieval is keyword-based, not embeddings.
 - Chat is non-streaming.
-- Onboarding path generation, quizzes, and progress UI are modeled in Prisma but not implemented in this first slice.
+- Depth levels affect prompt tone only when `OPENAI_API_KEY` is set; retrieval is unchanged.
+- Onboarding path generation, quizzes, and progress UI are modeled in Prisma but not implemented in this slice.
 
 ## Future Improvements
 
@@ -82,3 +149,7 @@ Included file types include Markdown, text, common application languages, JSON/Y
 - Team progress dashboards
 - Slack, Jira, Linear, and company docs ingestion
 - SSO, RBAC, audit logs, and multi-tenant workspaces
+
+## Evaluation
+
+Manual tests against `packages/mcp-ts-repo-builder` are documented in [docs/evaluation.md](../../docs/evaluation.md).
