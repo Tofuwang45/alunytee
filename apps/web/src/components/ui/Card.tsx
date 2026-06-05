@@ -1,19 +1,20 @@
 import { HTMLAttributes } from "react";
+import { GlassPanel } from "@/components/ui/GlassPanel";
 import { cn } from "@/lib/utils/cn";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <GlassPanel variant="default" className={cn("overflow-hidden", className)} {...props} />;
+}
+
+export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("rounded-md border border-border-default bg-surface", className)}
+      className={cn("border-b border-glass-border px-5 py-4", className)}
       {...props}
     />
   );
 }
 
-export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("border-b border-border-default px-4 py-3", className)} {...props} />;
-}
-
 export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-4", className)} {...props} />;
+  return <div className={cn("p-5", className)} {...props} />;
 }

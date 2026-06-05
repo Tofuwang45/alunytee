@@ -54,8 +54,10 @@ export default function ChatMessage({
     <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          isUser ? "bg-accent text-white" : "bg-surface-overlay text-muted",
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-1 ring-white/10",
+          isUser
+            ? "bg-gradient-to-br from-sky-400 to-indigo-500 text-white shadow-[0_0_12px_var(--accent-glow)]"
+            : "glass text-muted",
         )}
       >
         {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -64,7 +66,9 @@ export default function ChatMessage({
         <div
           className={cn(
             "inline-block rounded-2xl px-4 py-3 text-left",
-            isUser ? "bg-accent text-white" : "border border-border-default bg-surface",
+            isUser
+              ? "bg-gradient-to-br from-sky-500/90 to-indigo-600/90 text-white shadow-[0_4px_20px_var(--accent-glow)] backdrop-blur-sm"
+              : "glass-strong",
           )}
         >
           {isUser ? (

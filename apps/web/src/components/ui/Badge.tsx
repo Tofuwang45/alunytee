@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils/cn";
 type BadgeVariant = "default" | "success" | "muted" | "primary";
 
 const variantClasses: Record<BadgeVariant, string> = {
-  default: "border border-border-default bg-surface-overlay text-fg",
-  success: "border border-success/40 bg-success/20 text-[#3fb950]",
-  muted: "border border-border-muted bg-canvas text-muted",
-  primary: "border border-accent/40 bg-accent/20 text-accent-fg",
+  default: "glass-subtle border-glass-border text-fg",
+  success: "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300",
+  muted: "glass-subtle border-border-muted text-muted",
+  primary: "border border-sky-400/30 bg-sky-500/15 text-sky-300",
 };
 
 export function Badge({
@@ -18,7 +18,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm",
         variantClasses[variant],
         className,
       )}

@@ -11,18 +11,18 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "border border-success-hover bg-success text-white hover:bg-success-hover disabled:border-border-default disabled:bg-surface-overlay disabled:text-muted",
+    "border border-white/20 bg-gradient-to-br from-sky-400 via-indigo-500 to-violet-500 text-white shadow-[0_4px_20px_var(--accent-glow)] hover:brightness-110 disabled:from-zinc-600 disabled:to-zinc-700 disabled:border-white/10 disabled:text-zinc-400 disabled:shadow-none",
   secondary:
-    "bg-surface-overlay text-fg hover:bg-border-default disabled:bg-surface disabled:text-muted",
-  ghost: "bg-transparent text-fg hover:bg-surface-overlay disabled:text-muted",
+    "glass text-fg hover:bg-white/10 disabled:opacity-50",
+  ghost: "bg-transparent text-fg hover:bg-white/8 disabled:opacity-50",
   outline:
-    "border border-border-default bg-surface text-fg hover:bg-surface-overlay hover:border-muted disabled:bg-surface disabled:text-muted",
+    "glass border-glass-border text-fg hover:bg-white/8 hover:border-glass-highlight disabled:opacity-50",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "min-h-8 px-3 text-xs",
-  md: "min-h-9 px-4 text-sm",
-  lg: "min-h-10 px-5 text-sm",
+  sm: "min-h-8 px-4 text-xs rounded-full",
+  md: "min-h-9 px-5 text-sm rounded-full",
+  lg: "min-h-11 px-6 text-sm rounded-full",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -31,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ref={ref}
       type={type}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-medium transition disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center gap-2 font-medium transition disabled:cursor-not-allowed",
         variantClasses[variant],
         sizeClasses[size],
         className,

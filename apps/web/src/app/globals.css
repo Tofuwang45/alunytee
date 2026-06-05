@@ -1,33 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #0d1117;
-  --canvas-inset: #010409;
-  --surface: #161b22;
-  --surface-overlay: #1c2128;
-  --border-default: #30363d;
-  --border-muted: #21262d;
-  --fg: #e6edf3;
-  --muted: #8b949e;
-  --accent: #1f6feb;
-  --accent-fg: #58a6ff;
-  --success: #238636;
-  --success-hover: #2ea043;
-  --danger: #f85149;
-  --code-bg: #0d1117;
+  --canvas: #07080f;
+  --canvas-glow-1: #1a3a5c;
+  --canvas-glow-2: #2d1b4e;
+  --canvas-glow-3: #0d4f6e;
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg-strong: rgba(255, 255, 255, 0.1);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-highlight: rgba(255, 255, 255, 0.18);
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-overlay: rgba(255, 255, 255, 0.1);
+  --border-default: rgba(255, 255, 255, 0.12);
+  --border-muted: rgba(255, 255, 255, 0.06);
+  --fg: #f4f4f5;
+  --muted: #a1a1aa;
+  --accent: #38bdf8;
+  --accent-fg: #7dd3fc;
+  --accent-glow: rgba(56, 189, 248, 0.35);
+  --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #818cf8 100%);
+  --success: #34d399;
+  --success-hover: #6ee7b7;
+  --danger: #f87171;
+  --code-bg: rgba(0, 0, 0, 0.35);
 }
 
 @theme inline {
   --color-canvas: var(--canvas);
-  --color-canvas-inset: var(--canvas-inset);
   --color-surface: var(--surface);
   --color-surface-overlay: var(--surface-overlay);
+  --color-glass: var(--glass-bg);
+  --color-glass-strong: var(--glass-bg-strong);
+  --color-glass-subtle: var(--glass-bg-subtle);
+  --color-glass-border: var(--glass-border);
+  --color-glass-highlight: var(--glass-highlight);
   --color-border-default: var(--border-default);
   --color-border-muted: var(--border-muted);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
+  --color-accent-glow: var(--accent-glow);
   --color-success: var(--success);
   --color-success-hover: var(--success-hover);
   --color-danger: var(--danger);
@@ -46,13 +60,101 @@ body {
   font-family: var(--font-heading);
 }
 
+/* Ambient gradient canvas */
+.app-canvas {
+  position: relative;
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.app-canvas::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, var(--canvas-glow-1) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, var(--canvas-glow-2) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 60% 10%, var(--canvas-glow-3) 0%, transparent 45%);
+  opacity: 0.55;
+  animation: canvas-drift 24s ease-in-out infinite alternate;
+}
+
+.app-canvas::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes canvas-drift {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.05) translate(1%, 1%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-canvas::before {
+    animation: none;
+  }
+}
+
+/* Glass utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 var(--glass-highlight);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 var(--glass-highlight);
+}
+
+.glass-subtle {
+  background: var(--glass-bg-subtle);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-muted);
+}
+
+.glass-pill {
+  border-radius: 9999px;
+}
+
+.glass-glow {
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.glass-glow-ring {
+  box-shadow:
+    0 0 0 1px var(--glass-border),
+    0 0 16px var(--accent-glow);
+}
+
 * {
-  scrollbar-color: var(--border-default) var(--canvas-inset);
+  scrollbar-color: var(--glass-border) transparent;
   scrollbar-width: thin;
 }
 
 .code-line-highlight {
-  background: rgba(31, 111, 235, 0.15);
+  background: rgba(56, 189, 248, 0.12);
   border-left: 2px solid var(--accent-fg);
 }
 
@@ -89,19 +191,21 @@ body {
 
 .markdown-answer pre {
   margin: 0.75em 0;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   overflow-x: auto;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--glass-border);
+  background: var(--code-bg);
+  backdrop-filter: blur(12px);
 }
 
 .markdown-answer code:not(pre code) {
   font-family: ui-monospace, monospace;
   font-size: 0.875em;
-  background: var(--surface);
-  border: 1px solid var(--border-muted);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   padding: 0.125em 0.375em;
-  border-radius: 0.25rem;
-  color: var(--fg);
+  border-radius: 0.375rem;
+  color: var(--accent-fg);
 }
 
 .markdown-answer pre code {
@@ -111,7 +215,7 @@ body {
 }
 
 .markdown-answer blockquote {
-  border-left: 3px solid var(--border-default);
+  border-left: 3px solid var(--accent);
   padding-left: 1em;
   color: var(--muted);
   margin: 0.75em 0;
@@ -119,4 +223,26 @@ body {
 
 .markdown-answer a {
   color: var(--accent-fg);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--glass-bg-subtle) 0%,
+    var(--glass-bg) 50%,
+    var(--glass-bg-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+  }
 }

@@ -30,12 +30,12 @@ function SnippetBlock({
     : null;
 
   return (
-    <div className="overflow-hidden rounded-md border border-border-default bg-code-bg">
+    <div className="glass overflow-hidden rounded-xl">
       {snippet.filePath ? (
         <button
           type="button"
           onClick={() => source && onSelectSource(source)}
-          className="flex w-full items-center border-b border-border-muted px-3 py-1.5 text-left"
+          className="flex w-full items-center border-b border-glass-border bg-code-bg/50 px-3 py-1.5 text-left"
         >
           <CitationLink
             filePath={snippet.filePath}
@@ -79,7 +79,7 @@ export default function StructuredAnswerView({
         <ul className="space-y-1.5 text-muted">
           {structured.keyPoints.map((point) => (
             <li key={point} className="flex gap-2 leading-5">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-fg" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400 shadow-[0_0_6px_var(--accent-glow)]" />
               <span>{point}</span>
             </li>
           ))}

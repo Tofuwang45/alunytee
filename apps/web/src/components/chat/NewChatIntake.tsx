@@ -93,10 +93,10 @@ export default function NewChatIntake({ repos }: { repos: RepoOption[] }) {
             type="button"
             onClick={() => onChange(opt.id)}
             className={cn(
-              "rounded-md border px-4 py-3 text-left text-sm transition",
+              "glass-subtle rounded-xl border px-4 py-3 text-left text-sm transition",
               value === opt.id
-                ? "border-accent bg-accent/10 text-fg"
-                : "border-border-default bg-surface text-muted hover:border-muted hover:text-fg",
+                ? "glass-glow-ring border-sky-400/40 bg-white/10 text-fg"
+                : "border-glass-border text-muted hover:border-glass-highlight hover:bg-white/5 hover:text-fg",
             )}
           >
             {opt.label}
@@ -109,7 +109,7 @@ export default function NewChatIntake({ repos }: { repos: RepoOption[] }) {
   return (
     <div className="mx-auto flex h-full max-w-2xl flex-col justify-center px-4 py-8 sm:px-6">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-semibold text-fg">Start a conversation</h1>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight text-fg">Start a conversation</h1>
         <p className="mt-2 text-sm text-muted">
           A few quick questions so we can tailor onboarding to you.
         </p>
@@ -142,10 +142,10 @@ export default function NewChatIntake({ repos }: { repos: RepoOption[] }) {
                       type="button"
                       onClick={() => setRepositoryId(repo.id)}
                       className={cn(
-                        "flex w-full flex-col rounded-md border px-4 py-3 text-left transition",
+                        "glass-subtle flex w-full flex-col rounded-xl border px-4 py-3 text-left transition",
                         repositoryId === repo.id
-                          ? "border-accent bg-accent/10"
-                          : "border-border-default hover:border-muted",
+                          ? "glass-glow-ring border-sky-400/40 bg-white/10"
+                          : "border-glass-border hover:border-glass-highlight hover:bg-white/5",
                       )}
                     >
                       <span className="text-sm font-medium text-fg">{repo.name}</span>
@@ -203,7 +203,7 @@ export default function NewChatIntake({ repos }: { repos: RepoOption[] }) {
                     }}
                     placeholder="e.g. I need to understand how authentication works before my sprint review"
                     rows={3}
-                    className="mt-2 w-full resize-none rounded-md border border-border-default bg-canvas px-3 py-2 text-sm text-fg outline-none transition placeholder:text-muted focus:border-accent"
+                    className="mt-2 w-full resize-none rounded-xl border border-glass-border bg-white/5 px-3 py-2 text-sm text-fg outline-none transition placeholder:text-muted focus:border-sky-400/50 focus:ring-1 focus:ring-sky-400/30"
                   />
                 </div>
               </div>

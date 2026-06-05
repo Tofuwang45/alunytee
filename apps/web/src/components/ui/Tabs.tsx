@@ -40,7 +40,13 @@ export function Tabs({
 
 export function TabsList({ className, children }: { className?: string; children: ReactNode }) {
   return (
-    <div className={cn("inline-flex gap-1", className)} role="tablist">
+    <div
+      className={cn(
+        "glass inline-flex gap-1 rounded-full p-1",
+        className,
+      )}
+      role="tablist"
+    >
       {children}
     </div>
   );
@@ -67,9 +73,9 @@ export function TabsTrigger({
       aria-selected={isActive}
       onClick={() => context.setValue(value)}
       className={cn(
-        "rounded-t-md border border-transparent px-4 py-2 text-sm font-medium transition",
+        "rounded-full px-4 py-2 text-sm font-medium transition",
         isActive
-          ? "border-border-default border-b-surface bg-surface text-fg"
+          ? "bg-white/15 text-fg shadow-[0_0_12px_var(--accent-glow)]"
           : "text-muted hover:text-fg",
         className,
       )}

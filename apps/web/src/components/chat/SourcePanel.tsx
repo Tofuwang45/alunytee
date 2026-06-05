@@ -5,7 +5,6 @@ import { ExternalLink, FileCode2 } from "lucide-react";
 import CodeViewer from "./CodeViewer";
 import { FileReferenceList } from "./CitationLink";
 import { ActiveSource, FileReference, RetrievedChunk } from "./types";
-import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { buildGitHubFileUrl } from "@/lib/repo/github-links";
 
@@ -86,8 +85,8 @@ export default function SourcePanel({
       : fileContent?.githubUrl;
 
   return (
-    <Card className="flex min-h-0 flex-col overflow-hidden">
-      <CardHeader className="shrink-0 py-3">
+    <div className="flex min-h-0 flex-col overflow-hidden">
+      <div className="shrink-0 border-b border-glass-border px-4 py-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-fg">Sources</h2>
           {githubUrl ? (
@@ -101,17 +100,17 @@ export default function SourcePanel({
             </a>
           ) : null}
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-0 p-0">
-        <div className="max-h-[40%] shrink-0 overflow-y-auto border-b border-border-default px-4 pb-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-0">
+        <div className="max-h-[40%] shrink-0 overflow-y-auto border-b border-glass-border px-4 pb-4 pt-2">
           <FileReferenceList
             references={references}
             activeSource={activeSource}
             onSelect={onSelectSource}
           />
           {context.length > 0 ? (
-            <details className="mt-3 rounded-md border border-border-default bg-canvas p-3">
+            <details className="glass-subtle mt-3 rounded-xl p-3">
               <summary className="cursor-pointer text-xs font-medium text-muted">
                 Retrieved context ({context.length} chunks)
               </summary>
@@ -127,7 +126,7 @@ export default function SourcePanel({
                         endLine: chunk.endLine,
                       })
                     }
-                    className="block w-full rounded-md border border-border-default bg-surface p-2 text-left text-xs hover:border-accent"
+                    className="glass-subtle block w-full rounded-lg p-2 text-left text-xs transition hover:bg-white/10"
                   >
                     <span className="font-mono text-accent-fg">{chunk.filePath}</span>
                     {chunk.startLine != null ? (
@@ -165,7 +164,7 @@ export default function SourcePanel({
             />
           ) : null}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

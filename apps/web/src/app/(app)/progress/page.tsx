@@ -14,7 +14,7 @@ export default function ProgressPage() {
 
       <Card>
         <CardContent className="flex flex-col items-center py-16 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-md border border-border-default bg-canvas">
+          <div className="glass flex h-14 w-14 items-center justify-center rounded-2xl">
             <BarChart3 className="h-7 w-7 text-muted" />
           </div>
           <h2 className="mt-4 text-lg font-semibold text-fg">Not yet available</h2>

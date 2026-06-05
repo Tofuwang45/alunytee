@@ -30,7 +30,7 @@ export default function LocalAgentPage() {
           </Badge>
           <p className="mt-4 max-w-3xl text-sm text-muted">
             The CLI lives in{" "}
-            <code className="rounded border border-border-default bg-canvas px-1.5 py-0.5 font-mono text-xs text-fg">
+            <code className="glass-subtle rounded-lg px-1.5 py-0.5 font-mono text-xs text-sky-300">
               packages/mcp-ts-repo-builder
             </code>
             . It runs on a local repo path with role-aware answers and strips adversarial comment patterns
@@ -60,7 +60,7 @@ export default function LocalAgentPage() {
       <Card>
         <CardContent className="pt-4">
           <h2 className="text-base font-semibold text-fg">Run locally</h2>
-          <pre className="mt-4 overflow-auto rounded-md border border-border-default bg-canvas-inset p-4 text-sm text-fg">
+          <pre className="glass mt-4 overflow-auto rounded-xl p-4 text-sm text-fg">
             <code>{`cd packages/mcp-ts-repo-builder
 npm run build
 node dist/index.js --role senior --repo . --question "Trace POST /products"`}</code>
@@ -74,7 +74,7 @@ node dist/index.js --role senior --repo . --question "Trace POST /products"`}</c
           <div className="mt-4 flex flex-wrap gap-2">
             {graphSteps.map((step, index) => (
               <div key={`${step}-${index}`} className="flex items-center gap-2">
-                <span className="rounded-md border border-border-default bg-canvas px-3 py-2 font-mono text-xs text-muted">
+                <span className="glass-subtle rounded-lg px-3 py-2 font-mono text-xs text-muted">
                   {step}
                 </span>
                 {index < graphSteps.length - 1 ? <span className="text-muted">→</span> : null}

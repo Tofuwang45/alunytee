@@ -200,9 +200,9 @@ export default function SessionChat({
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border-default px-4 py-3">
+      <header className="glass-subtle mx-3 mt-3 flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="truncate text-sm font-medium text-fg">{repoName}</span>
+          <span className="truncate font-heading text-sm font-medium text-fg">{repoName}</span>
           <div className="relative">
             <Button
               variant="ghost"
@@ -221,10 +221,10 @@ export default function SessionChat({
                   aria-label="Close tools"
                   onClick={() => setToolsOpen(false)}
                 />
-                <div className="absolute left-0 top-full z-20 mt-1 w-48 rounded-md border border-border-default bg-surface py-1 shadow-lg">
+                <div className="glass-strong absolute left-0 top-full z-20 mt-1 w-48 overflow-hidden py-1">
                   <Link
                     href={`/repos/${repositoryId}/explore`}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-fg hover:bg-surface-overlay"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-fg hover:bg-white/10"
                     onClick={() => setToolsOpen(false)}
                   >
                     <Layers className="h-4 w-4" />
@@ -232,7 +232,7 @@ export default function SessionChat({
                   </Link>
                   <Link
                     href={`/repos/${repositoryId}/tour`}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-fg hover:bg-surface-overlay"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-fg hover:bg-white/10"
                     onClick={() => setToolsOpen(false)}
                   >
                     <Compass className="h-4 w-4" />
@@ -240,7 +240,7 @@ export default function SessionChat({
                   </Link>
                   <Link
                     href={`/repos/${repositoryId}/brief`}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-fg hover:bg-surface-overlay"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-fg hover:bg-white/10"
                     onClick={() => setToolsOpen(false)}
                   >
                     <FileText className="h-4 w-4" />
@@ -293,10 +293,10 @@ export default function SessionChat({
         {sourcesOpen ? (
           <div
             className={cn(
-              "absolute inset-y-0 right-0 z-20 flex w-full max-w-md flex-col border-l border-border-default bg-canvas shadow-xl sm:relative sm:shadow-none",
+              "glass-strong absolute inset-y-0 right-0 z-20 m-3 flex w-full max-w-md flex-col overflow-hidden rounded-2xl sm:relative",
             )}
           >
-            <div className="flex items-center justify-between border-b border-border-default px-3 py-2 sm:hidden">
+            <div className="flex items-center justify-between border-b border-glass-border px-3 py-2 sm:hidden">
               <span className="text-sm font-medium text-fg">Sources</span>
               <button
                 type="button"

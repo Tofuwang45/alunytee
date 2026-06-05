@@ -83,7 +83,7 @@ export default function RepoIngestForm({ redirectTo }: { redirectTo?: string }) 
               value={url}
               onChange={(event) => setUrl(event.target.value)}
               placeholder="https://github.com/vercel/next.js"
-              className="min-h-11 flex-1 rounded-md border border-border-default bg-canvas px-3 text-sm text-fg outline-none transition focus:border-accent"
+              className="glass-subtle min-h-11 flex-1 rounded-xl border border-glass-border px-3 text-sm text-fg outline-none transition focus:border-sky-400/50 focus:ring-1 focus:ring-sky-400/30"
               required
             />
             <Button type="submit" disabled={isLoading} size="lg">

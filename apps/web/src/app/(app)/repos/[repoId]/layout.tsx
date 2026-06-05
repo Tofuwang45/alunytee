@@ -22,20 +22,20 @@ export default async function RepoLayout({
 
   return (
     <div className="flex h-full flex-col overflow-auto">
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border-default px-4 py-3">
+      <div className="glass-subtle mx-3 mt-3 flex shrink-0 items-center justify-between gap-3 rounded-2xl px-4 py-3">
         <div className="min-w-0">
-          <h1 className="truncate text-sm font-semibold text-fg">{repo.name}</h1>
+          <h1 className="truncate font-heading text-sm font-semibold text-fg">{repo.name}</h1>
           <p className="truncate text-xs text-muted">{repo.url}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <nav className="hidden items-center gap-3 text-xs sm:flex">
-            <Link href={`/repos/${repo.id}/explore`} className="text-muted hover:text-accent-fg">
+            <Link href={`/repos/${repo.id}/explore`} className="text-muted transition hover:text-sky-300">
               Explore
             </Link>
-            <Link href={`/repos/${repo.id}/tour`} className="text-muted hover:text-accent-fg">
+            <Link href={`/repos/${repo.id}/tour`} className="text-muted transition hover:text-sky-300">
               Tour
             </Link>
-            <Link href={`/repos/${repo.id}/brief`} className="text-muted hover:text-accent-fg">
+            <Link href={`/repos/${repo.id}/brief`} className="text-muted transition hover:text-sky-300">
               Brief
             </Link>
           </nav>
@@ -48,7 +48,7 @@ export default async function RepoLayout({
           <ReindexButton repoUrl={repo.url} />
         </div>
       </div>
-      <div className="flex-1">{children}</div>
+      <div className="flex-1 px-3 pb-3">{children}</div>
     </div>
   );
 }

@@ -13,9 +13,11 @@ export default function DepthSwitch({
   className?: string;
 }) {
   return (
-    <div className={cn("inline-flex flex-col gap-1", className)}>
-      <span className="text-[11px] font-medium uppercase tracking-wide text-muted">Explain for</span>
-      <div className="inline-flex rounded-md border border-border-default bg-canvas p-0.5">
+    <div className={cn("inline-flex flex-col gap-1.5", className)}>
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-muted">
+        Explain for
+      </span>
+      <div className="glass inline-flex rounded-full p-1">
         {DEPTH_LEVELS.map((level) => (
           <button
             key={level.id}
@@ -23,8 +25,10 @@ export default function DepthSwitch({
             title={level.hint}
             onClick={() => onChange(level.id)}
             className={cn(
-              "rounded px-2.5 py-1 text-xs font-medium transition",
-              value === level.id ? "bg-surface-overlay text-fg" : "text-muted hover:text-fg",
+              "rounded-full px-3 py-1.5 text-xs font-medium transition",
+              value === level.id
+                ? "bg-white/15 text-fg shadow-[0_0_10px_var(--accent-glow)]"
+                : "text-muted hover:text-fg",
             )}
           >
             {level.label}
