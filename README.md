@@ -7,22 +7,8 @@
 
 ---
 
-## Project Submission Rubric (15 Points)
 
-Teaching staff evaluate submissions on the criteria below. This rubric is reproduced here for graders and demo video reference.
-
-| Criterion | Points | What graders look for |
-|-----------|--------|------------------------|
-| **Problem & Insight** | 3 | Meaningful problem; compelling motivation; original, ambitious, thoughtful approach |
-| **Execution & Technical Work** | 5 | Substantial individual work; functional artifact; technical effort matches scope; iteration and progress |
-| **Evaluation & Evidence** | 3 | Validation attempts, limitations analysis (benchmarks, testing, comparisons, failure analysis, etc.) |
-| **Communication & Presentation** | 2 | Understandable to outsiders; demo/README clarity; reproducibility |
-| **Process, Integrity & Disclosure** | 2 | Honest AI usage disclosure; credited sources; major decisions and limitations; genuine effort over time |
-
----
-
-## 1. Problem & Insight (3 Points)
-
+## 1. Problem & Insight
 ### Problem
 
 When engineers leave an organization, tacit knowledge about *why* code works a certain way often leaves with them. New hires spend weeks reading scattered docs and tracing unfamiliar codebases before they can contribute confidently.
@@ -52,7 +38,7 @@ The MVP focuses on the core loop: **ingest → retrieve → answer with sources*
 
 ---
 
-## 2. Execution & Technical Work (5 Points)
+## 2. Execution & Technical Work
 
 ### Architecture
 
@@ -116,7 +102,7 @@ See [apps/web/README.md](apps/web/README.md) for routes, API reference, and envi
 
 ---
 
-## 3. Evaluation & Evidence (3 Points)
+## 3. Evaluation & Evidence
 
 Manual evaluation against the fixture package is documented in **[docs/evaluation.md](docs/evaluation.md)**.
 
@@ -129,7 +115,7 @@ Summary:
 
 ---
 
-## 4. Communication & Presentation (2 Points)
+## 4. Communication & Presentation
 
 Submission materials are written for someone outside the team: this README, the synced [apps/web/README.md](apps/web/README.md), and [docs/evaluation.md](docs/evaluation.md) with reproducible setup steps. The live demo walks through ingest → intake → session chat → citations → depth → brief/tour.
 
@@ -144,7 +130,7 @@ Submission materials are written for someone outside the team: this README, the 
 
 ---
 
-## 5. Process, Integrity & Disclosure (2 Points)
+## 5. Process, Integrity & Disclosure
 
 ### AI usage in development (moderate)
 
