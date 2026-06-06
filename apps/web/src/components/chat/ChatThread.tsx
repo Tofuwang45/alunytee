@@ -10,11 +10,13 @@ export default function ChatThread({
   isLoading,
   activeSource,
   onSelectSource,
+  onAskInStep,
 }: {
   messages: ChatMessageType[];
   isLoading: boolean;
   activeSource: ActiveSource | null;
   onSelectSource: (source: ActiveSource) => void;
+  onAskInStep?: (stepFiles: string[]) => void;
 }) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +46,7 @@ export default function ChatThread({
           message={message}
           activeSource={activeSource}
           onSelectSource={onSelectSource}
+          onAskInStep={onAskInStep}
         />
       ))}
       {isLoading ? (

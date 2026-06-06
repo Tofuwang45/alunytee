@@ -64,12 +64,20 @@ export default function NewChatIntake({ repos }: { repos: RepoOption[] }) {
       if (!ok || !data?.id) {
         throw new Error(
           error.includes("Internal Server") || error.includes("ENOENT")
-            ? "Server error — stop the dev server, delete apps/web/.next, then run npm run dev again."
+            ? "Server error — run npm run dev:clean from the repo root, then retry."
             : error || "Failed to create session.",
         );
       }
-      const q = encodeURIComponent(goalToFirstQuestion(resolvedGoal));
-      router.push(`/c/${data!.id}?q=${q}`);
+      const firstQuestion = goalToFirstQuestion(resolvedGoal);
+      const chat = await fetchJson<{ error?: string }>("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: data.id, question: firstQuestion, mode: "lesson" }),
+      });
+      if (!chat.ok) {
+        throw new Error(chat.error || "Failed to send the first question.");
+      }
+      router.push(`/c/${data.id}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to start chat.");
       setIsLoading(false);

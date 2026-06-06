@@ -4,6 +4,10 @@ import { FileCode2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { ActiveSource, FileReference } from "./types";
 
+function fileName(path: string) {
+  return path.split("/").pop() ?? path;
+}
+
 export default function CitationLink({
   filePath,
   startLine,
@@ -24,27 +28,29 @@ export default function CitationLink({
     activeSource?.startLine === (startLine ?? null) &&
     activeSource?.endLine === (endLine ?? null);
 
-  const label =
-    children ??
-    (startLine != null && endLine != null
-      ? `${filePath}:${startLine}-${endLine}`
+  const lineSuffix =
+    startLine != null && endLine != null
+      ? `:${startLine}-${endLine}`
       : startLine != null
-        ? `${filePath}:${startLine}`
-        : filePath);
+        ? `:${startLine}`
+        : "";
+
+  const label = children ?? `${fileName(filePath)}${lineSuffix}`;
 
   return (
     <button
       type="button"
       onClick={() => onSelect({ filePath, startLine: startLine ?? null, endLine: endLine ?? null })}
+      title={`${filePath}${lineSuffix}`}
       className={cn(
-        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 font-mono text-xs transition",
+        "inline-flex max-w-full items-center gap-1.5 rounded-lg border px-2 py-1 font-mono text-[11px] backdrop-blur-md transition",
         isActive
-          ? "border-accent bg-accent/20 text-accent-fg"
-          : "border-border-default bg-surface-overlay text-accent-fg hover:border-accent",
+          ? "glass-glow-ring border-sky-400/50 bg-sky-500/15 text-sky-300"
+          : "border-glass-border bg-white/[0.06] text-sky-300/90 hover:bg-white/10",
       )}
     >
       <FileCode2 className="h-3 w-3 shrink-0" />
-      <span className="break-all">{label}</span>
+      <span className="truncate">{label}</span>
     </button>
   );
 }
@@ -59,11 +65,11 @@ export function FileReferenceList({
   onSelect: (source: ActiveSource) => void;
 }) {
   if (!references.length) {
-    return <p className="text-sm text-muted">References appear after the first answer.</p>;
+    return <p className="text-xs text-muted">References appear after the first answer.</p>;
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       {references.map((reference) => {
         const isActive =
           activeSource?.filePath === reference.filePath &&
@@ -82,24 +88,26 @@ export function FileReferenceList({
               })
             }
             className={cn(
-              "w-full rounded-md border p-3 text-left transition",
+              "w-full rounded-lg border p-2.5 text-left backdrop-blur-md transition",
               isActive
-                ? "border-accent bg-accent/10"
-                : "border-border-default bg-canvas hover:border-muted hover:bg-surface-overlay",
+                ? "glass-glow-ring border-sky-400/40 bg-sky-500/10"
+                : "border-glass-border bg-white/[0.04] hover:bg-white/[0.08]",
             )}
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div className="break-all font-mono text-xs font-medium text-fg">{reference.filePath}</div>
-                <div className="mt-1 text-xs text-muted">
-                  {reference.startLine != null
-                    ? `Lines ${reference.startLine}–${reference.endLine}`
-                    : "Full file"}
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-mono text-[11px] font-medium text-fg" title={reference.filePath}>
+                  {fileName(reference.filePath)}
                 </div>
+                <div className="mt-0.5 truncate text-[10px] text-muted" title={reference.filePath}>
+                  {reference.filePath}
+                </div>
+                {reference.startLine != null ? (
+                  <div className="mt-0.5 text-[10px] text-muted">
+                    L{reference.startLine}–{reference.endLine}
+                  </div>
+                ) : null}
               </div>
-              <span className="shrink-0 rounded-full border border-border-default bg-surface-overlay px-2 py-0.5 text-[10px] font-medium text-muted">
-                {Math.round(reference.score * 10) / 10}
-              </span>
             </div>
           </button>
         );

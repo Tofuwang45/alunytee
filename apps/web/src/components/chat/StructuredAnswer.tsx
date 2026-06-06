@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { StructuredAnswer as StructuredAnswerType } from "@/lib/ai/structured";
 import { highlightCode } from "@/lib/shiki/highlighter";
 import CitationLink from "./CitationLink";
-import { ActiveSource, FileReference } from "./types";
+import { ActiveSource } from "./types";
 
 function SnippetBlock({
   snippet,
@@ -30,12 +30,12 @@ function SnippetBlock({
     : null;
 
   return (
-    <div className="glass overflow-hidden rounded-xl">
+    <div className="glass-subtle overflow-hidden rounded-xl backdrop-blur-md">
       {snippet.filePath ? (
         <button
           type="button"
           onClick={() => source && onSelectSource(source)}
-          className="flex w-full items-center border-b border-glass-border bg-code-bg/50 px-3 py-1.5 text-left"
+          className="flex w-full items-center border-b border-glass-border bg-code-bg px-3 py-2 text-left"
         >
           <CitationLink
             filePath={snippet.filePath}
@@ -46,28 +46,28 @@ function SnippetBlock({
           />
         </button>
       ) : null}
-      {html ? (
-        <div
-          className="overflow-x-auto p-3 [&_pre]:!m-0 [&_pre]:!bg-transparent [&_pre]:!p-0 [&_code]:!text-xs [&_code]:!leading-5"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
-      ) : (
-        <pre className="overflow-x-auto p-3">
-          <code className="text-xs leading-5 text-fg">{snippet.code}</code>
-        </pre>
-      )}
+      <div className="max-h-44 overflow-y-auto">
+        {html ? (
+          <div
+            className="overflow-x-auto p-3 [&_pre]:!m-0 [&_pre]:!bg-transparent [&_pre]:!p-0 [&_code]:!text-[11px] [&_code]:!leading-5"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        ) : (
+          <pre className="overflow-x-auto p-3">
+            <code className="text-[11px] leading-5 text-fg">{snippet.code}</code>
+          </pre>
+        )}
+      </div>
     </div>
   );
 }
 
 export default function StructuredAnswerView({
   structured,
-  references,
   activeSource,
   onSelectSource,
 }: {
   structured: StructuredAnswerType;
-  references: FileReference[];
   activeSource: ActiveSource | null;
   onSelectSource: (source: ActiveSource) => void;
 }) {
@@ -76,10 +76,10 @@ export default function StructuredAnswerView({
       <p className="font-medium leading-6 text-fg">{structured.summary}</p>
 
       {structured.keyPoints.length > 0 ? (
-        <ul className="space-y-1.5 text-muted">
+        <ul className="space-y-2 text-muted">
           {structured.keyPoints.map((point) => (
-            <li key={point} className="flex gap-2 leading-5">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400 shadow-[0_0_6px_var(--accent-glow)]" />
+            <li key={point} className="flex gap-2.5 leading-5">
+              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-sky-400" />
               <span>{point}</span>
             </li>
           ))}
@@ -87,7 +87,7 @@ export default function StructuredAnswerView({
       ) : null}
 
       {structured.steps.length > 0 ? (
-        <ol className="list-decimal space-y-1 pl-5 text-muted">
+        <ol className="list-decimal space-y-1.5 pl-5 text-muted">
           {structured.steps.map((step) => (
             <li key={step} className="leading-5">
               {step}
@@ -97,28 +97,13 @@ export default function StructuredAnswerView({
       ) : null}
 
       {structured.snippets.length > 0 ? (
-        <div className="space-y-2">
+        <div className="space-y-2 pt-1">
           {structured.snippets.map((snippet, i) => (
             <SnippetBlock
               key={`${snippet.filePath ?? "snip"}-${i}`}
               snippet={snippet}
               activeSource={activeSource}
               onSelectSource={onSelectSource}
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {references.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          {references.slice(0, 5).map((ref) => (
-            <CitationLink
-              key={`${ref.filePath}:${ref.startLine}`}
-              filePath={ref.filePath}
-              startLine={ref.startLine}
-              endLine={ref.endLine}
-              activeSource={activeSource}
-              onSelect={onSelectSource}
             />
           ))}
         </div>

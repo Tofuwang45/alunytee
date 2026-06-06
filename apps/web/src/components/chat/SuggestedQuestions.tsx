@@ -10,14 +10,15 @@ export default function SuggestedQuestions({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {questions.map((question) => (
+    <div className="flex flex-wrap gap-1.5">
+      {questions.slice(0, 3).map((question) => (
         <button
           key={question}
           type="button"
           disabled={disabled}
           onClick={() => onSelect(question)}
-          className="glass-subtle rounded-full px-3 py-1.5 text-xs text-muted transition hover:bg-white/10 hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-50"
+          className="glass-subtle max-w-full truncate rounded-full px-3 py-1 text-[11px] text-muted transition hover:bg-white/8 hover:text-fg disabled:cursor-not-allowed disabled:opacity-40"
+          title={question}
         >
           {question}
         </button>

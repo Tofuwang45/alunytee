@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "npm run dev -w @alunytee/web",
+    "dev:clean": "npm run dev:clean -w @alunytee/web",
     "build": "npm run build -w @alunytee/web",
     "lint": "npm run lint -w @alunytee/web",
     "build:fixture": "npm run build -w mcp-ts-repo-builder"

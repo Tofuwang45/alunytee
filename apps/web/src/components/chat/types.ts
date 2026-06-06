@@ -1,4 +1,4 @@
-import { StructuredAnswer } from "@/lib/ai/structured";
+import { Lesson, StructuredAnswer } from "@/lib/ai/structured";
 
 export type FileReference = {
   filePath: string;
@@ -16,12 +16,17 @@ export type RetrievedChunk = {
   score: number;
 };
 
+export type ChatMode = "lesson" | "answer";
+
 export type ChatResponse = {
   answer: string;
   structured: StructuredAnswer | null;
+  lesson: Lesson | null;
   usedModel: string;
   references: FileReference[];
   context: RetrievedChunk[];
+  mode?: ChatMode;
+  followUps?: string[];
 };
 
 export type ActiveSource = {
@@ -38,6 +43,7 @@ export type ChatMessage =
       content: string;
       usedModel: string;
       structured: StructuredAnswer | null;
+      lesson: Lesson | null;
       references: FileReference[];
       context: RetrievedChunk[];
     };

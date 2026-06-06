@@ -58,6 +58,7 @@ model ChatTurn {
   references Json?
   context    Json?
   structured Json?
+  lesson     Json?
   usedModel  String?
   createdAt  DateTime @default(now())
 

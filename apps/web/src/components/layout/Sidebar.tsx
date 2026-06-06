@@ -88,6 +88,16 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     void load();
   }
 
+  async function disconnectRepo(id: string, name: string) {
+    const confirmed = window.confirm(
+      `Disconnect "${name}"? This removes its indexed files and all chats based on it.`,
+    );
+    if (!confirmed) return;
+    await fetch(`/api/repos/${id}`, { method: "DELETE" });
+    void load();
+    router.push("/");
+  }
+
   function navClick() {
     onNavigate?.();
   }
@@ -117,14 +127,23 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           </p>
           <ul className="max-h-28 space-y-0.5 overflow-y-auto">
             {repos.map((repo) => (
-              <li key={repo.id}>
+              <li key={repo.id} className="group relative">
                 <Link
                   href={`/repos/${repo.id}/explore`}
                   onClick={navClick}
-                  className="block truncate rounded-lg px-2.5 py-1.5 text-xs text-muted transition hover:bg-white/8 hover:text-fg"
+                  className="block truncate rounded-lg py-1.5 pl-2.5 pr-8 text-xs text-muted transition hover:bg-white/8 hover:text-fg"
                 >
                   {repo.name}
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => void disconnectRepo(repo.id, repo.name)}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 rounded-lg p-1 text-muted opacity-0 transition hover:bg-white/10 hover:text-danger group-hover:opacity-100"
+                  aria-label={`Disconnect ${repo.name}`}
+                  title="Disconnect repository"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
               </li>
             ))}
           </ul>

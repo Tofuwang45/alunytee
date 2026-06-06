@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ChevronDown,
@@ -19,21 +19,33 @@ import { Button } from "@/components/ui/Button";
 import {
   ActiveSource,
   ChatMessage,
+  ChatMode,
   ChatResponse,
   FileReference,
   RetrievedChunk,
   dedupeReferences,
 } from "./types";
 import { DepthLevel, isDepthLevel } from "@/lib/ai/depth";
-import { parseStructuredAnswer } from "@/lib/ai/structured";
+import { parseLesson, parseStructuredAnswer } from "@/lib/ai/structured";
 import { fetchJson } from "@/lib/utils/fetch-json";
 import { cn } from "@/lib/utils/cn";
 
-const FOLLOW_UP_QUESTIONS = [
-  "Show me the main entry point",
-  "What tests exist?",
+const TEACHING_QUESTIONS = [
+  "Explain that step more simply",
+  "Walk me through the next area",
+  "Start a guided walkthrough",
+];
+
+const GENERAL_QUESTIONS = [
+  "What does this project do?",
+  "How do I run it locally?",
   "Explain the folder structure",
 ];
+
+type AskOptions = {
+  mode?: ChatMode;
+  stepFiles?: string[];
+};
 
 type PersistedTurn = {
   id: string;
@@ -42,6 +54,7 @@ type PersistedTurn = {
   references: unknown;
   context: unknown;
   structured: unknown;
+  lesson: unknown;
   usedModel: string | null;
 };
 
@@ -56,6 +69,7 @@ function toChatMessages(turns: PersistedTurn[]): ChatMessage[] {
       content: t.content,
       usedModel: t.usedModel ?? "fallback",
       structured: parseStructuredAnswer(t.structured),
+      lesson: parseLesson(t.lesson),
       references: (t.references as FileReference[]) ?? [],
       context: (t.context as RetrievedChunk[]) ?? [],
     };
@@ -70,7 +84,6 @@ export default function SessionChat({
   defaultBranch,
   initialDepth,
   initialMessages,
-  seedQuestion,
 }: {
   sessionId: string;
   repositoryId: string;
@@ -79,7 +92,6 @@ export default function SessionChat({
   defaultBranch: string | null;
   initialDepth: string;
   initialMessages: PersistedTurn[];
-  seedQuestion?: string;
 }) {
   const [depth, setDepth] = useState<DepthLevel>(
     isDepthLevel(initialDepth) ? initialDepth : "plain",
@@ -92,7 +104,14 @@ export default function SessionChat({
   const [toolsOpen, setToolsOpen] = useState(false);
   const [latestReferences, setLatestReferences] = useState<FileReference[]>([]);
   const [latestContext, setLatestContext] = useState<RetrievedChunk[]>([]);
-  const [seeded, setSeeded] = useState(false);
+  const [lessonStepFiles, setLessonStepFiles] = useState<string[]>([]);
+  const [serverFollowUps, setServerFollowUps] = useState<string[]>([]);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
+
+  const hasActiveLesson = useMemo(
+    () => messages.some((m) => m.role === "assistant" && m.lesson),
+    [messages],
+  );
 
   const handleDepthChange = useCallback(
     (next: DepthLevel) => {
@@ -107,11 +126,17 @@ export default function SessionChat({
   );
 
   const askQuestion = useCallback(
-    async (question: string) => {
+    async (question: string, opts?: AskOptions) => {
       setError("");
       setIsLoading(true);
       const tempUserId = `temp-${Date.now()}`;
       setMessages((prev) => [...prev, { id: tempUserId, role: "user", content: question }]);
+
+      const isWalkthrough =
+        opts?.mode === "lesson" || question === "Start a guided walkthrough";
+      const mode: ChatMode = isWalkthrough ? "lesson" : "answer";
+      const stepFiles =
+        opts?.stepFiles ?? (mode === "answer" && lessonStepFiles.length ? lessonStepFiles : undefined);
 
       try {
         const { ok, data, error } = await fetchJson<
@@ -123,7 +148,7 @@ export default function SessionChat({
         >("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId, question }),
+          body: JSON.stringify({ sessionId, question, mode, stepFiles }),
         });
 
         if (!ok || !data) throw new Error(error || "Unable to answer question.");
@@ -131,14 +156,30 @@ export default function SessionChat({
         const references = dedupeReferences(data.references);
         setLatestReferences(references);
         setLatestContext(data.context);
+        setServerFollowUps(data.followUps ?? []);
 
-        if (references[0]) {
-          setActiveSource({
-            filePath: references[0].filePath,
-            startLine: references[0].startLine,
-            endLine: references[0].endLine,
-          });
+        const firstRef =
+          data.lesson?.steps[0]?.filePath != null
+            ? {
+                filePath: data.lesson.steps[0].filePath!,
+                startLine: data.lesson.steps[0].startLine,
+                endLine: data.lesson.steps[0].endLine,
+              }
+            : references[0]
+              ? {
+                  filePath: references[0].filePath,
+                  startLine: references[0].startLine,
+                  endLine: references[0].endLine,
+                }
+              : null;
+
+        if (firstRef) {
+          setActiveSource(firstRef);
           setSourcesOpen(true);
+        }
+
+        if (mode === "answer" && stepFiles?.length) {
+          setLessonStepFiles([]);
         }
 
         setMessages((prev) => {
@@ -156,6 +197,7 @@ export default function SessionChat({
               content: data.answer,
               usedModel: data.usedModel,
               structured: data.structured ?? null,
+              lesson: data.lesson ?? null,
               references,
               context: data.context,
             },
@@ -168,20 +210,28 @@ export default function SessionChat({
         setIsLoading(false);
       }
     },
-    [sessionId],
+    [sessionId, lessonStepFiles],
   );
 
-  useEffect(() => {
-    if (seedQuestion && !seeded && messages.length === 0) {
-      setSeeded(true);
-      void askQuestion(seedQuestion);
+  const handleAskInStep = useCallback((stepFiles: string[]) => {
+    setLessonStepFiles(stepFiles);
+    composerRef.current?.focus();
+  }, []);
+
+  const suggestedQuestions = useMemo(() => {
+    if (messages.length === 0) {
+      return ["Start a guided walkthrough", ...GENERAL_QUESTIONS.slice(0, 2)];
     }
-  }, [seedQuestion, seeded, messages.length, askQuestion]);
+    if (serverFollowUps.length) return serverFollowUps;
+    return hasActiveLesson ? TEACHING_QUESTIONS : GENERAL_QUESTIONS;
+  }, [messages.length, hasActiveLesson, serverFollowUps]);
 
-  const suggestedQuestions = useMemo(
-    () => (messages.length === 0 ? [] : FOLLOW_UP_QUESTIONS),
-    [messages.length],
-  );
+  const composerPlaceholder =
+    lessonStepFiles.length > 0
+      ? "Ask about this step..."
+      : hasActiveLesson
+        ? "Ask a follow-up or continue the walkthrough..."
+        : "Ask about this codebase...";
 
   const sourcePanel = (
     <SourcePanel
@@ -200,15 +250,15 @@ export default function SessionChat({
 
   return (
     <div className="flex h-full flex-col">
-      <header className="glass-subtle mx-3 mt-3 flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3">
+      <header className="glass mx-3 mt-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-2xl px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-2">
           <span className="truncate font-heading text-sm font-medium text-fg">{repoName}</span>
           <div className="relative">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => setToolsOpen(!toolsOpen)}
-              className="gap-1 text-muted"
+              className="gap-1"
             >
               Tools
               <ChevronDown className="h-3.5 w-3.5" />
@@ -254,7 +304,7 @@ export default function SessionChat({
         <div className="flex items-center gap-2">
           <DepthSwitch value={depth} onChange={handleDepthChange} />
           <Button
-            variant="outline"
+            variant={sourcesOpen ? "secondary" : "outline"}
             size="sm"
             onClick={() => setSourcesOpen(!sourcesOpen)}
             className="hidden sm:inline-flex"
@@ -280,12 +330,15 @@ export default function SessionChat({
                 setActiveSource(source);
                 setSourcesOpen(true);
               }}
+              onAskInStep={handleAskInStep}
             />
             {error ? <p className="pb-2 text-sm text-danger">{error}</p> : null}
             <ChatComposer
               onSubmit={askQuestion}
               isLoading={isLoading}
               suggestedQuestions={suggestedQuestions}
+              inputRef={composerRef}
+              placeholder={composerPlaceholder}
             />
           </div>
         </div>

@@ -1,29 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #07080f;
-  --canvas-glow-1: #1a3a5c;
-  --canvas-glow-2: #2d1b4e;
-  --canvas-glow-3: #0d4f6e;
+  --canvas: #030304;
+  --canvas-glow-1: #1e3a5f;
+  --canvas-glow-2: #2a1a4a;
+  --canvas-glow-3: #0e3a52;
   --glass-bg: rgba(255, 255, 255, 0.06);
   --glass-bg-strong: rgba(255, 255, 255, 0.1);
-  --glass-bg-subtle: rgba(255, 255, 255, 0.03);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.035);
   --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-highlight: rgba(255, 255, 255, 0.18);
+  --glass-highlight: rgba(255, 255, 255, 0.16);
+  --glass-sheen: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
   --surface: rgba(255, 255, 255, 0.06);
   --surface-overlay: rgba(255, 255, 255, 0.1);
   --border-default: rgba(255, 255, 255, 0.12);
   --border-muted: rgba(255, 255, 255, 0.06);
-  --fg: #f4f4f5;
-  --muted: #a1a1aa;
+  --fg: #fafafa;
+  --muted: #8b8b96;
   --accent: #38bdf8;
   --accent-fg: #7dd3fc;
-  --accent-glow: rgba(56, 189, 248, 0.35);
+  --accent-glow: rgba(56, 189, 248, 0.32);
   --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #818cf8 100%);
   --success: #34d399;
   --success-hover: #6ee7b7;
   --danger: #f87171;
-  --code-bg: rgba(0, 0, 0, 0.35);
+  --code-bg: rgba(0, 0, 0, 0.45);
 }
 
 @theme inline {
@@ -77,7 +83,7 @@ body {
     radial-gradient(ellipse 80% 50% at 20% 20%, var(--canvas-glow-1) 0%, transparent 50%),
     radial-gradient(ellipse 60% 40% at 80% 80%, var(--canvas-glow-2) 0%, transparent 50%),
     radial-gradient(ellipse 50% 30% at 60% 10%, var(--canvas-glow-3) 0%, transparent 45%);
-  opacity: 0.55;
+  opacity: 0.38;
   animation: canvas-drift 24s ease-in-out infinite alternate;
 }
 
@@ -106,32 +112,33 @@ body {
   }
 }
 
-/* Glass utilities */
+/* Glass utilities — frosted translucency + luminous edge */
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--glass-sheen), var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
   border: 1px solid var(--glass-border);
   box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.2),
+    0 4px 24px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 var(--glass-highlight);
 }
 
 .glass-strong {
-  background: var(--glass-bg-strong);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
+  background: var(--glass-sheen), var(--glass-bg-strong);
+  backdrop-filter: blur(32px) saturate(1.5);
+  -webkit-backdrop-filter: blur(32px) saturate(1.5);
   border: 1px solid var(--glass-border);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 var(--glass-highlight);
 }
 
 .glass-subtle {
-  background: var(--glass-bg-subtle);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--glass-sheen), var(--glass-bg-subtle);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
   border: 1px solid var(--border-muted);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .glass-pill {

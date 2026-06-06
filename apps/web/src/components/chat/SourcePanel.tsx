@@ -7,6 +7,7 @@ import { FileReferenceList } from "./CitationLink";
 import { ActiveSource, FileReference, RetrievedChunk } from "./types";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { buildGitHubFileUrl } from "@/lib/repo/github-links";
+import { fetchJson } from "@/lib/utils/fetch-json";
 
 type FileContent = {
   path: string;
@@ -50,10 +51,20 @@ export default function SourcePanel({
     if (activeSource.startLine != null) params.set("startLine", String(activeSource.startLine));
     if (activeSource.endLine != null) params.set("endLine", String(activeSource.endLine));
 
-    fetch(`/api/repos/${repositoryId}/files?${params}`)
-      .then((res) => res.json())
-      .then((data: FileContent & { error?: string }) => {
+    void fetchJson<FileContent & { error?: string }>(
+      `/api/repos/${repositoryId}/files?${params}`,
+    )
+      .then(({ ok, data, error }) => {
         if (cancelled) return;
+        if (!ok || !data) {
+          setFileError(
+            error.includes("Internal Server") || error.includes("ENOENT")
+              ? "Server error — run npm run dev:clean from the repo root."
+              : error || "Failed to load file.",
+          );
+          setFileContent(null);
+          return;
+        }
         if (data.error) {
           setFileError(data.error);
           setFileContent(null);

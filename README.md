@@ -131,20 +131,7 @@ Summary:
 
 ## 4. Communication & Presentation (2 Points)
 
-### Demo video outline
-
-Use this script when recording your submission video:
-
-1. **(30s)** Show this rubric table on screen.
-2. **(30s)** State the problem: knowledge loss and slow repo onboarding.
-3. **(2–3 min)** Live demo:
-   - Ingest `https://github.com/Tofuwang45/alunytee` (includes the fixture package).
-   - Complete intake (role, experience, goal).
-   - Ask: *"Explain how authentication is required for creating products."*
-   - Show citations, depth switch, and optional listen/speak buttons.
-   - Open brief or tour for the indexed repo.
-4. **(1 min)** Summarize evaluation: retrieval hits correct files; note keyword vs embedding trade-off.
-5. **(30s)** AI disclosure (below) and repo link.
+Submission materials are written for someone outside the team: this README, the synced [apps/web/README.md](apps/web/README.md), and [docs/evaluation.md](docs/evaluation.md) with reproducible setup steps. The live demo walks through ingest → intake → session chat → citations → depth → brief/tour.
 
 ### Documentation map
 

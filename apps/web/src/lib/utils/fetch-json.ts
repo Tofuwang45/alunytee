@@ -10,11 +10,17 @@ export async function fetchJson<T>(
     data = text ? (JSON.parse(text) as T) : null;
   } catch {
     const snippet = text.trim().slice(0, 120);
+    const isServerCrash =
+      snippet.startsWith("Internal Server") ||
+      snippet.includes("ENOENT") ||
+      res.status >= 500;
     return {
       ok: false,
       status: res.status,
       data: null,
-      error: snippet || `Request failed (${res.status})`,
+      error: isServerCrash
+        ? "Server error — stop the dev server, run npm run dev:clean from the repo root, then retry."
+        : snippet || `Request failed (${res.status})`,
     };
   }
 

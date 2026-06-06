@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import SessionChat from "@/components/chat/SessionChat";
-import { goalToFirstQuestion, isDepthLevel } from "@/lib/ai/depth";
+import { isDepthLevel } from "@/lib/ai/depth";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,6 @@ function SessionContent({
   defaultBranch,
   depth,
   messages,
-  seedQuestion,
 }: {
   sessionId: string;
   repositoryId: string;
@@ -29,9 +28,9 @@ function SessionContent({
     references: unknown;
     context: unknown;
     structured: unknown;
+    lesson: unknown;
     usedModel: string | null;
   }[];
-  seedQuestion?: string;
 }) {
   return (
     <SessionChat
@@ -42,20 +41,16 @@ function SessionContent({
       defaultBranch={defaultBranch}
       initialDepth={depth}
       initialMessages={messages}
-      seedQuestion={seedQuestion}
     />
   );
 }
 
 export default async function SessionPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ sessionId: string }>;
-  searchParams: Promise<{ q?: string }>;
 }) {
   const { sessionId } = await params;
-  const { q } = await searchParams;
 
   const session = await prisma.chatSession.findUnique({
     where: { id: sessionId },
@@ -69,9 +64,6 @@ export default async function SessionPage({
 
   if (!session) notFound();
 
-  const seedQuestion =
-    q ?? (session.messages.length === 0 && session.goal ? goalToFirstQuestion(session.goal) : undefined);
-
   return (
     <Suspense fallback={<div className="p-6 text-sm text-muted">Loading chat...</div>}>
       <SessionContent
@@ -82,7 +74,6 @@ export default async function SessionPage({
         defaultBranch={session.repository.defaultBranch}
         depth={isDepthLevel(session.depth) ? session.depth : "plain"}
         messages={session.messages}
-        seedQuestion={seedQuestion}
       />
     </Suspense>
   );
